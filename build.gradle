@@ -20,19 +20,26 @@ repositories {
         name = "bstats-repo"
         url = "https://repo.codemc.org/repository/maven-public/"
     }
+    maven {
+        name = "jitpack"
+        url = "https://jitpack.io"
+    }
 }
 
 dependencies {
-    // 添加 Spigot API依赖
+    // Spigot
     compileOnly "org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT"
     
-    // 添加 NeigeItems API依赖
+    // NeigeItems
     compileOnly files('libs/NeigeItems-1.21.77.jar')
     
-    // 添加 NBTAPI 依赖
+    // NBTAPI
     compileOnly files('libs/item-nbt-api-plugin-2.15.0.jar')
     
-    // 添加 bStats 依赖
+    // ItemsAdder
+    compileOnly "com.github.LoneDev6:API-ItemsAdder:3.6.3-beta-14"
+    
+    // bStats
     implementation 'org.bstats:bstats-bukkit:3.0.2'
 }
 
