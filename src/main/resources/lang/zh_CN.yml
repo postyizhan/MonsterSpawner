@@ -1,0 +1,32 @@
+prefix: "&8[&3Monster&bSpawner&8] "
+messages:
+  disabled: "{prefix}&7插件已卸载"
+  reload: "{prefix}&7插件重载成功！"
+  no-permission: "{prefix}&7你没有权限执行此命令！"
+  invalid-command: "{prefix}&7无效的命令！请使用 &7/ms help &7查看帮助。"
+  help:
+    - "&a===== MonsterSpawner 帮助 ====="
+    - "&7/ms reload &f- 重载插件"
+    - "&7/ms help &f- 显示帮助信息"
+  spawner:
+    break-success: "{prefix}&7你成功挖掘了一个刷怪笼！"
+    break-fail: "{prefix}&7挖掘失败！刷怪笼已损坏。"
+    silk-touch-bonus: "{prefix}&7你使用了精准采集工具，提高了挖掘成功率！"
+    no-permission: "{prefix}&7你没有权限挖掘刷怪笼！"
+    place-success: "{prefix}&7你成功放置了一个 &f%entity_type% &7刷怪笼！"
+
+# 插件启动和钩子信息
+system:
+  hooks:
+    enabled: "{prefix}&7已成功载入对 &f{0} &7插件的支持"
+    disabled: "{prefix}&e{0} 未找到，相关功能已禁用"
+  debug:
+    spawner:
+      set_type_error: "{prefix}无法设置刷怪笼类型: %error%"
+      break_info: "{prefix}玩家 %player% 使用%tool_type%工具挖掘了一个 %entity_type% 刷怪笼，结果: %result%，失败概率: %fail_chance%"
+      default_type: "{prefix}放置的刷怪笼没有特定的实体类型信息，使用默认类型"
+      set_type_success: "{prefix}成功设置刷怪笼实体类型为: %entity_type%"
+      lore_found_type: "{prefix}从物品Lore中找到实体类型: %entity_type%"
+      invalid_type: "{prefix}无效的实体类型: %entity_type%"
+      read_lore_error: "{prefix}从物品Lore中读取实体类型时出错: %error%"
+      set_entity_type_error: "{prefix}设置刷怪笼实体类型时出错: %error%"

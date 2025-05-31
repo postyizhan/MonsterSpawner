@@ -1,0 +1,31 @@
+prefix: "&8[&3Monster&bSpawner&8] "
+messages:
+  reload: "{prefix}&7Plugin reloaded successfully!"
+  no-permission: "{prefix}&7You don't have permission to execute this command!"
+  invalid-command: "{prefix}&7Invalid command! Use &7/ms help &7to see help."
+  help:
+    - "{prefix}&a===== MonsterSpawner Help ====="
+    - "{prefix}&7/ms reload &f- Reload the plugin"
+    - "{prefix}&7/ms help &f- Show help information"
+  spawner:
+    break-success: "{prefix}&7You successfully mined a spawner!"
+    break-fail: "{prefix}&7Mining failed! The spawner has been damaged."
+    silk-touch-bonus: "{prefix}&7You used a Silk Touch tool, increasing the success rate!"
+    no-permission: "{prefix}&7You don't have permission to break spawners!"
+    place-success: "{prefix}&7You successfully placed a &f%entity_type% &7spawner!"
+
+# Plugin startup and hook information
+system:
+  hooks:
+    enabled: "{prefix}&7Successfully loaded support for &f{0} &7plugin"
+    disabled: "{prefix}&e{0} not found, related features have been disabled"
+  debug:
+    spawner:
+      set_type_error: "{prefix}Cannot set spawner type: %error%"
+      break_info: "{prefix}Player %player% used %tool_type% tool to mine a %entity_type% spawner, result: %result%, fail chance: %fail_chance%"
+      default_type: "{prefix}Placed spawner has no specific entity type information, using default type"
+      set_type_success: "{prefix}Successfully set spawner entity type to: %entity_type%"
+      lore_found_type: "{prefix}Entity type found in item lore: %entity_type%"
+      invalid_type: "{prefix}Invalid entity type: %entity_type%"
+      read_lore_error: "{prefix}Error reading entity type from item lore: %error%"
+      set_entity_type_error: "{prefix}Error setting spawner entity type: %error%"

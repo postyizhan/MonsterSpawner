@@ -1,0 +1,25 @@
+name: MonsterSpawner
+version: '${version}'
+main: github.postyizhan.monsterspawner.MonsterSpawner
+api-version: '1.13'
+authors: [postyizhan]
+description: A lightweight Minecraft plugin for managing Monster Spawner
+softdepend: [PlaceholderAPI, ItemsAdder, MythicMobs, NeigeItems]
+
+commands:
+  monsterspawner:
+    description: MonsterSpawner main command
+    aliases: [ms]
+    usage: /<command> [reload|help]
+    permission: monsterspawner.use
+
+permissions:
+  monsterspawner.admin:
+    description: Allows access to admin commands
+    default: op
+  monsterspawner.break:
+    description: Allows breaking monster spawners
+    default: true
+  monsterspawner.use:
+    description: Allows using basic commands
+    default: true

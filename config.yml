@@ -1,0 +1,31 @@
+### MonsterSpawner 配置文件 ###
+
+# 语言设置 (目前支持: zh_CN, en_US)
+language: zh_CN
+
+# 刷怪笼挖掘设置
+spawner:
+  # 挖掘失败的概率 (0.0-1.0)
+  fail-chance: 0.3
+  
+  # 精准采集减少的失败概率
+  silk-touch-bonus: 0.2
+  
+  # 挖掘成功时执行的动作
+  success-actions:
+    - "[message] &a成功挖掘了刷怪笼！"
+    - "[sound] BLOCK_NOTE_BLOCK_PLING 1.0 1.0"
+    - "[drop_monster_spawner]"
+    
+  # 挖掘失败时执行的动作
+  fail-actions:
+    - "[message] &c挖掘刷怪笼失败！"
+    - "[sound] BLOCK_ANVIL_LAND 1.0 1.0"
+    - "[title] &c挖掘失败 &7刷怪笼碎裂了"
+    
+  # 使用精准采集工具时额外执行的动作
+  silk-touch-actions:
+    - "[message] &a你使用了精准采集工具！"
+
+# 调试模式
+debug: false
