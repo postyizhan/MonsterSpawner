@@ -4,6 +4,7 @@ import github.postyizhan.monsterspawner.MonsterSpawner;
 import github.postyizhan.monsterspawner.hook.ItemsAdderHook;
 import github.postyizhan.monsterspawner.hook.MythicMobsHook;
 import github.postyizhan.monsterspawner.hook.NeigeItemsHook;
+import github.postyizhan.monsterspawner.hook.OraxenHook;
 import github.postyizhan.monsterspawner.hook.PlaceholderAPIHook;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -236,45 +237,48 @@ public class ActionManager {
                 break;
                 
             case "drop":
-                if (plugin.getConfig().getBoolean("debug")) {
-                    plugin.getLogger().info("尝试掉落物品: " + content);
-                }
-                ItemStack dropItem = parseItemStack(content, player);
-                if (dropItem != null) {
-                    if (plugin.getConfig().getBoolean("debug")) {
-                        plugin.getLogger().info("成功掉落物品: " + dropItem.getType() + " x" + dropItem.getAmount());
+                try {
+                    String[] dropData = content.split(" ");
+                    String itemId = dropData[0];
+                    int amount = 1;
+                    
+                    if (dropData.length > 1) {
+                        amount = Integer.parseInt(dropData[1]);
                     }
                     
-                    // 根据是否有方块参数决定掉落位置
-                    if (block != null) {
-                        block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), dropItem);
-                        if (plugin.getConfig().getBoolean("debug")) {
-                            plugin.getLogger().info("在方块位置掉落物品: " + block.getX() + ", " + block.getY() + ", " + block.getZ());
+                    ItemStack itemToDrop = parseItemStack(itemId, amount, player);
+                    if (itemToDrop != null) {
+                        if (block != null) {
+                            block.getWorld().dropItemNaturally(block.getLocation(), itemToDrop);
+                        } else {
+                            player.getWorld().dropItemNaturally(player.getLocation(), itemToDrop);
                         }
                     } else {
-                        player.getWorld().dropItemNaturally(player.getLocation(), dropItem);
-                        if (plugin.getConfig().getBoolean("debug")) {
-                            plugin.getLogger().info("在玩家位置掉落物品");
-                        }
+                        plugin.getLogger().warning("掉落物品错误: 无法识别物品 " + itemId);
                     }
-                } else {
-                    plugin.getLogger().warning("掉落物品失败，物品为null: " + content);
+                } catch (Exception e) {
+                    plugin.getLogger().warning("掉落物品错误: " + content + " - " + e.getMessage());
                 }
                 break;
                 
             case "give":
-                if (plugin.getConfig().getBoolean("debug")) {
-                    plugin.getLogger().info("尝试给予物品: " + content);
-                }
-                ItemStack giveItem = parseItemStack(content, player);
-                if (giveItem != null) {
-                    if (plugin.getConfig().getBoolean("debug")) {
-                        plugin.getLogger().info("成功给予物品: " + giveItem.getType() + " x" + giveItem.getAmount());
+                try {
+                    String[] giveData = content.split(" ");
+                    String itemId = giveData[0];
+                    int amount = 1;
+                    
+                    if (giveData.length > 1) {
+                        amount = Integer.parseInt(giveData[1]);
                     }
-                    player.getInventory().addItem(giveItem).forEach((index, leftover) -> 
-                        player.getWorld().dropItemNaturally(player.getLocation(), leftover));
-                } else {
-                    plugin.getLogger().warning("给予物品失败，物品为null: " + content);
+                    
+                    ItemStack itemToGive = parseItemStack(itemId, amount, player);
+                    if (itemToGive != null) {
+                        player.getInventory().addItem(itemToGive);
+                    } else {
+                        plugin.getLogger().warning("给予物品错误: 无法识别物品 " + itemId);
+                    }
+                } catch (Exception e) {
+                    plugin.getLogger().warning("给予物品错误: " + content + " - " + e.getMessage());
                 }
                 break;
                 
@@ -308,96 +312,64 @@ public class ActionManager {
     }
 
     /**
-     * 解析物品字符串为ItemStack
-     * @param content 物品内容
-     * @return 物品实例
+     * 解析物品ID并获取物品栈
+     * @param content 物品ID
+     * @param amount 数量
+     * @param player 玩家（用于替换占位符）
+     * @return 物品栈
      */
-    private ItemStack parseItemStack(String content) {
-        return parseItemStack(content, null);
-    }
-    
-    /**
-     * 解析物品字符串为ItemStack
-     * @param content 物品内容
-     * @param player 玩家（可以为null）
-     * @return 物品实例
-     */
-    private ItemStack parseItemStack(String content, Player player) {
+    private ItemStack parseItemStack(String content, int amount, Player player) {
+        // 尝试作为原版物品处理
         try {
-            String[] itemData = content.split(" ");
-            String itemId = itemData[0];
-            int amount = 1;
-            
-            if (itemData.length > 1) {
-                amount = Integer.parseInt(itemData[1]);
-            }
-
-            if (plugin.getConfig().getBoolean("debug")) {
-                plugin.getLogger().info("解析物品: " + content + ", 物品ID: " + itemId + ", 数量: " + amount);
-            }
-            
-            // 处理普通物品
-            if (itemId.startsWith("minecraft:")) {
-                itemId = itemId.substring(10); // 去掉"minecraft:"前缀
-                if (plugin.getConfig().getBoolean("debug")) {
-                    plugin.getLogger().info("处理Minecraft原版物品: " + itemId);
-                }
-            }
-            
-            // 检查是否是物品库插件的物品
-            if (ItemsAdderHook.isEnabled() && ItemsAdderHook.isItemsAdderItem(itemId)) {
-                if (plugin.getConfig().getBoolean("debug")) {
-                    plugin.getLogger().info("通过ItemsAdder获取物品: " + itemId);
-                }
-                return ItemsAdderHook.getItemStack(itemId, amount);
-            } else if (MythicMobsHook.isEnabled() && itemId.startsWith("mythicmobs:")) {
-                if (plugin.getConfig().getBoolean("debug")) {
-                    plugin.getLogger().info("通过MythicMobs获取物品: " + itemId.substring(11));
-                }
-                return MythicMobsHook.getItemStack(itemId.substring(11), amount);
-            } else if (NeigeItemsHook.isEnabled() && itemId.startsWith("neigeitems:")) {
-                String neigeItemId = itemId.substring(11);
-                if (plugin.getConfig().getBoolean("debug")) {
-                    plugin.getLogger().info("通过NeigeItems获取物品: " + neigeItemId + ", 是否有玩家: " + (player != null));
-                }
-                
-                ItemStack result;
-                if (player != null) {
-                    // 如果有玩家，使用带玩家参数的方法
-                    result = NeigeItemsHook.getItemStack(neigeItemId, player, amount);
-                } else {
-                    // 否则使用不带玩家参数的方法
-                    result = NeigeItemsHook.getItemStack(neigeItemId, amount);
-                }
-                
-                if (plugin.getConfig().getBoolean("debug")) {
-                    if (result == null) {
-                        plugin.getLogger().warning("NeigeItems返回的物品为null: " + neigeItemId);
-                    } else {
-                        plugin.getLogger().info("成功获取NeigeItems物品: " + neigeItemId + ", 类型: " + result.getType());
-                    }
-                }
-                
-                return result;
-            } else {
-                // 普通Minecraft物品
-                try {
-                    if (plugin.getConfig().getBoolean("debug")) {
-                        plugin.getLogger().info("尝试作为Minecraft原版物品处理: " + itemId.toUpperCase());
-                    }
-                    Material material = Material.valueOf(itemId.toUpperCase());
-                    return new ItemStack(material, amount);
-                } catch (IllegalArgumentException e) {
-                    plugin.getLogger().warning("无效的物品ID: " + itemId);
-                    return null;
-                }
-            }
-        } catch (Exception e) {
-            plugin.getLogger().warning("解析物品错误: " + content + " - " + e.getMessage());
-            if (plugin.getConfig().getBoolean("debug")) {
-                e.printStackTrace();
-            }
-            return null;
+            Material material = Material.valueOf(content.toUpperCase());
+            return new ItemStack(material, amount);
+        } catch (IllegalArgumentException ignored) {
+            // 不是原版物品，继续尝试其他插件物品
         }
+        
+        // 尝试作为NeigeItems物品处理
+        if (content.toLowerCase().startsWith("neigeitems:")) {
+            String neigeItemId = content.substring("neigeitems:".length());
+            if (NeigeItemsHook.isEnabled()) {
+                return NeigeItemsHook.getItemStack(neigeItemId, amount);
+            }
+        }
+        
+        // 处理以"itemsadder:"开头的物品ID
+        if (content.toLowerCase().startsWith("itemsadder:")) {
+            String itemsAdderId = content.substring("itemsadder:".length());
+            if (ItemsAdderHook.isEnabled()) {
+                return ItemsAdderHook.getItemStack(itemsAdderId, amount);
+            }
+        }
+        // 原有的ItemsAdder处理逻辑
+        else if (content.contains(":") && ItemsAdderHook.isEnabled()) {
+            if (ItemsAdderHook.isItemsAdderItem(content)) {
+                return ItemsAdderHook.getItemStack(content, amount);
+            }
+        }
+        
+        // 处理以"oraxen:"开头的物品ID
+        if (content.toLowerCase().startsWith("oraxen:")) {
+            String oraxenItemId = content.substring("oraxen:".length());
+            if (plugin.hasOraxen()) {
+                return OraxenHook.getItemStack(oraxenItemId, amount);
+            }
+        }
+        // 原有的Oraxen处理逻辑
+        else if (plugin.hasOraxen() && OraxenHook.isOraxenItem(content)) {
+            return OraxenHook.getItemStack(content, amount);
+        }
+        
+        // 尝试作为MythicMobs物品处理
+        if (content.toLowerCase().startsWith("mythicmobs:")) {
+            String mythicItemId = content.substring("mythicmobs:".length());
+            if (MythicMobsHook.isEnabled()) {
+                return MythicMobsHook.getItemStack(mythicItemId, amount);
+            }
+        }
+        
+        // 如果所有尝试都失败，返回空
+        return null;
     }
 }

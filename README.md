@@ -11,7 +11,7 @@
 - ✅ **刷怪笼管理**：支持精准采集和普通工具挖掘刷怪笼
 - ✅ **多语言支持**：内置中文和英文语言文件，可轻松扩展
 - ✅ **丰富的动作系统**：支持命令执行、物品掉落、音效播放等多种动作
-- ✅ **钩子系统**：兼容 PlaceholderAPI、ItemsAdder、MythicMobs、NeigeItems 等插件
+- ✅ **钩子系统**：兼容 PlaceholderAPI、ItemsAdder、MythicMobs、NeigeItems、Oraxen 等插件
 - ✅ **灵活配置**：完全可自定义的配置和消息系统
 
 ## 💻 安装
@@ -23,15 +23,15 @@
 
 ## 🔧 命令
 
-| 命令         | 描述                    | 权限                 |
-|--------------|------------------------|----------------------|
+| 命令         | 描述                     | 权限                 |
+|--------------|--------------------------|----------------------|
 | `/ms reload` | 重载插件配置和语言文件   | monsterspawner.admin |
-| `/ms help`   | 显示帮助信息            | -                    |
+| `/ms help`   | 显示帮助信息             | -                    |
 
 ## 🔒 权限
 
-| 权限                 | 描述              | 默认 |
-|----------------------|------------------|------|
+| 权限                 | 描述               | 默认 |
+|----------------------|--------------------|------|
 | monsterspawner.admin | 允许使用管理员命令 | op   |
 | monsterspawner.break | 允许破坏刷怪笼     | true |
 | monsterspawner.use   | 允许使用基础命令   | true |
@@ -42,27 +42,28 @@ MonsterSpawner 提供了丰富的动作系统，可以在配置文件中使用�
 
 **格式说明：** `[]` 为必填参数，`()` 为选填参数
 
-| 动作语法                               | 描述                    | 示例                                   |
-|---------------------------------------|-------------------------|----------------------------------------|
-| `[command] [命令]`                    | 让玩家执行命令            | `[command] spawn`                      |
-| `[op] [命令]`                         | 临时给予玩家OP权限执行命令 | `[op] gamemode creative`               |
-| `[console] [命令]`                    | 在控制台执行命令          | `[console] broadcast 有人挖掘了刷怪笼！` |
-| `[sound] [音效] (音量) (音调)`         | 为玩家播放音效            | `[sound] BLOCK_ANVIL_LAND 1.0 1.5`     |
-| `[message] [文本]`                    | 向玩家发送消息            | `[message] &a你成功挖掘了刷怪笼！`       |
-| `[title] [主标题] (副标题)`            | 向玩家展示标题            | `[title] &a挖掘成功 &7获得了一个刷怪笼`  |
-| `[drop_monster_spawner]`              | 掉落被破坏的刷怪笼        | `[drop_monster_spawner]`               |
-| `[drop] [物品ID] (数量)`               | 在指定位置掉落物品        | `[drop] DIAMOND 5`                     |
-| `[give] [物品ID] (数量)`               | 给予玩家物品             | `[give] neigeitems:special_sword 1`    |
-| `[buff] [药水效果] (持续时间秒) (等级)` | 给予玩家药水效果          | `[buff] SPEED 30 2`                    |
+| 动作语法                                | 描述                       | 示例                                     |
+|-----------------------------------------|----------------------------|------------------------------------------|
+| `[command] [命令]`                      | 让玩家执行命令             | `[command] spawn`                        |
+| `[op] [命令]`                           | 临时给予玩家OP权限执行命令 | `[op] gamemode creative`                 |
+| `[console] [命令]`                      | 在控制台执行命令           | `[console] broadcast 有人挖掘了刷怪笼！` |
+| `[sound] [音效] (音量) (音调)`          | 为玩家播放音效             | `[sound] BLOCK_ANVIL_LAND 1.0 1.5`       |
+| `[message] [文本]`                      | 向玩家发送消息             | `[message] &a你成功挖掘了刷怪笼！`       |
+| `[title] [主标题] (副标题)`             | 向玩家展示标题             | `[title] &a挖掘成功 &7获得了一个刷怪笼`  |
+| `[drop_monster_spawner]`                | 掉落被破坏的刷怪笼         | `[drop_monster_spawner]`                 |
+| `[drop] [物品ID] (数量)`                | 在指定位置掉落物品         | `[drop] DIAMOND 5`                       |
+| `[give] [物品ID] (数量)`                | 给予玩家物品               | `[give] neigeitems:special_sword 1`      |
+| `[buff] [药水效果] (持续时间秒) (等级)` | 给予玩家药水效果           | `[buff] SPEED 30 2`                      |
 
 ### 物品ID格式
 
-| 物品库      | 语法                |
+| 物品库      | 语法               |
 |------------|---------------------|
 | Minecraft  | 物品ID              |
 | NeigeItems | neigeitems:物品ID   |
 | ItemsAdder | namespace:物品ID    |
 | MythicMobs | mythicmobs:物品ID   |
+| Oraxen     | oraxen:物品ID       |
 
 ### 内建变量
 

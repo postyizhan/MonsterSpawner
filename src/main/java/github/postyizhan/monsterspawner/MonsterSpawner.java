@@ -4,6 +4,7 @@ import github.postyizhan.monsterspawner.command.CommandManager;
 import github.postyizhan.monsterspawner.hook.ItemsAdderHook;
 import github.postyizhan.monsterspawner.hook.MythicMobsHook;
 import github.postyizhan.monsterspawner.hook.NeigeItemsHook;
+import github.postyizhan.monsterspawner.hook.OraxenHook;
 import github.postyizhan.monsterspawner.hook.PlaceholderAPIHook;
 import github.postyizhan.monsterspawner.listener.SpawnerListener;
 import github.postyizhan.monsterspawner.listener.SpawnerPlaceListener;
@@ -125,6 +126,19 @@ public final class MonsterSpawner extends JavaPlugin {
                     .replace("{0}", "NeigeItems");
             getServer().getConsoleSender().sendMessage(message);
         }
+        
+        // Oraxen
+        OraxenHook.initialize();
+        if (OraxenHook.isEnabled()) {
+            String message = languageManager.getString("system.hooks.enabled")
+                    .replace("{prefix}", languageManager.getPrefix())
+                    .replace("{0}", "Oraxen");
+            getServer().getConsoleSender().sendMessage(message);
+        } else {
+            String message = languageManager.getString("system.hooks.disabled")
+                    .replace("{0}", "Oraxen");
+            getServer().getConsoleSender().sendMessage(message);
+        }
     }
 
     @Override
@@ -142,6 +156,14 @@ public final class MonsterSpawner extends JavaPlugin {
     
     public boolean hasPlaceholderAPI() {
         return PlaceholderAPIHook.isEnabled();
+    }
+    
+    /**
+     * 检查Oraxen是否启用
+     * @return Oraxen是否启用
+     */
+    public boolean hasOraxen() {
+        return OraxenHook.isEnabled();
     }
     
     /**
