@@ -1,5 +1,12 @@
 ### MonsterSpawner 配置文件 ###
 
+# 更新检查设置
+update-checker:
+  # 是否启用更新检查
+  enabled: true
+  # 检查频率（天）
+  check-interval-days: 1
+
 # 语言设置 (目前支持: zh_CN, en_US)
 language: zh_CN
 

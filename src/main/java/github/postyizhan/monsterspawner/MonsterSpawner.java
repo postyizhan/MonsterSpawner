@@ -10,7 +10,9 @@ import github.postyizhan.monsterspawner.listener.SpawnerListener;
 import github.postyizhan.monsterspawner.listener.SpawnerPlaceListener;
 import github.postyizhan.monsterspawner.utils.ActionManager;
 import github.postyizhan.monsterspawner.utils.LanguageManager;
+import github.postyizhan.monsterspawner.utils.UpdateChecker;
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bstats.bukkit.Metrics;
 
@@ -21,6 +23,7 @@ public final class MonsterSpawner extends JavaPlugin {
     private LanguageManager languageManager;
     private ActionManager actionManager;
     private CommandManager commandManager;
+    private UpdateChecker updateChecker;
     private AtomicInteger spawnersBroken = new AtomicInteger(0);
     private AtomicInteger spawnersPlaced = new AtomicInteger(0);
     
@@ -72,6 +75,16 @@ public final class MonsterSpawner extends JavaPlugin {
 
         // 初始化钩子
         setupHooks();
+        
+        // 初始化并注册更新检查器
+        setupUpdateChecker();
+    }
+    
+    private void setupUpdateChecker() {
+        updateChecker = new UpdateChecker(this);
+        if (getConfig().getBoolean("update-checker.enabled", true)) {
+            getServer().getPluginManager().registerEvents(updateChecker, this);
+        }
     }
     
     private void setupHooks() {
@@ -180,11 +193,25 @@ public final class MonsterSpawner extends JavaPlugin {
         spawnersPlaced.incrementAndGet();
     }
     
+    /**
+     * 获取更新检查器实例
+     * @return 更新检查器
+     */
+    public UpdateChecker getUpdateChecker() {
+        return updateChecker;
+    }
+    
     @Override
     public void reloadConfig() {
         super.reloadConfig();
         if (languageManager != null) {
             languageManager.loadLanguage();
+        }
+        
+        // 重新设置更新检查器
+        if (updateChecker != null) {
+            HandlerList.unregisterAll(updateChecker);
+            setupUpdateChecker();
         }
     }
 }

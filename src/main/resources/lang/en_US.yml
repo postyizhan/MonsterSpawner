@@ -19,6 +19,10 @@ system:
   hooks:
     enabled: "{prefix}&7Successfully loaded support for &f{0} &7plugin"
     disabled: "{prefix}&e{0} not found, related features have been disabled"
+  updater:
+    update_available: "{prefix}&eNew version available! Current version: &c{current_version}&e, Latest version: &a{latest_version}"
+    update_url: "{prefix}&eVisit: &bhttps://github.com/postyizhan/MonsterSpawner/releases/latest &eto get the latest version"
+    up_to_date: "{prefix}&aYou are using the latest version!"
   debug:
     spawner:
       set_type_error: "{prefix}Cannot set spawner type: %error%"
