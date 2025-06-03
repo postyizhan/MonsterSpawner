@@ -1,10 +1,7 @@
 package github.postyizhan.monsterspawner;
 
 import github.postyizhan.monsterspawner.command.CommandManager;
-import github.postyizhan.monsterspawner.hook.ItemsAdderHook;
-import github.postyizhan.monsterspawner.hook.MythicMobsHook;
-import github.postyizhan.monsterspawner.hook.NeigeItemsHook;
-import github.postyizhan.monsterspawner.hook.OraxenHook;
+import github.postyizhan.monsterspawner.hook.HookManager;
 import github.postyizhan.monsterspawner.hook.PlaceholderAPIHook;
 import github.postyizhan.monsterspawner.listener.SpawnerListener;
 import github.postyizhan.monsterspawner.listener.SpawnerPlaceListener;
@@ -24,6 +21,7 @@ public final class MonsterSpawner extends JavaPlugin {
     private ActionManager actionManager;
     private CommandManager commandManager;
     private UpdateChecker updateChecker;
+    private HookManager hookManager;
     private AtomicInteger spawnersBroken = new AtomicInteger(0);
     private AtomicInteger spawnersPlaced = new AtomicInteger(0);
     
@@ -38,6 +36,9 @@ public final class MonsterSpawner extends JavaPlugin {
         
         // 初始化语言管理器
         languageManager = new LanguageManager(this);
+        
+        // 初始化钩子管理器
+        hookManager = new HookManager(this);
         
         // 初始化动作管理器
         actionManager = new ActionManager(this);
@@ -73,8 +74,8 @@ public final class MonsterSpawner extends JavaPlugin {
             getServer().getConsoleSender().sendMessage(line);
         }
 
-        // 初始化钩子
-        setupHooks();
+        // 初始化PlaceholderAPI钩子
+        setupPlaceholderAPI();
         
         // 初始化并注册更新检查器
         setupUpdateChecker();
@@ -87,7 +88,7 @@ public final class MonsterSpawner extends JavaPlugin {
         }
     }
     
-    private void setupHooks() {
+    private void setupPlaceholderAPI() {
         // PlaceholderAPI
         PlaceholderAPIHook.initialize();
         if (PlaceholderAPIHook.isEnabled()) {
@@ -98,58 +99,6 @@ public final class MonsterSpawner extends JavaPlugin {
         } else {
             String message = languageManager.getString("system.hooks.disabled")
                     .replace("{0}", "PlaceholderAPI");
-            getServer().getConsoleSender().sendMessage(message);
-        }
-        
-        // ItemsAdder
-        ItemsAdderHook.initialize();
-        if (ItemsAdderHook.isEnabled()) {
-            String message = languageManager.getString("system.hooks.enabled")
-                    .replace("{prefix}", languageManager.getPrefix())
-                    .replace("{0}", "ItemsAdder");
-            getServer().getConsoleSender().sendMessage(message);
-        } else {
-            String message = languageManager.getString("system.hooks.disabled")
-                    .replace("{0}", "ItemsAdder");
-            getServer().getConsoleSender().sendMessage(message);
-        }
-        
-        // MythicMobs
-        MythicMobsHook.initialize();
-        if (MythicMobsHook.isEnabled()) {
-            String message = languageManager.getString("system.hooks.enabled")
-                    .replace("{prefix}", languageManager.getPrefix())
-                    .replace("{0}", "MythicMobs");
-            getServer().getConsoleSender().sendMessage(message);
-        } else {
-            String message = languageManager.getString("system.hooks.disabled")
-                    .replace("{0}", "MythicMobs");
-            getServer().getConsoleSender().sendMessage(message);
-        }
-        
-        // NeigeItems
-        NeigeItemsHook.initialize();
-        if (NeigeItemsHook.isEnabled()) {
-            String message = languageManager.getString("system.hooks.enabled")
-                    .replace("{prefix}", languageManager.getPrefix())
-                    .replace("{0}", "NeigeItems");
-            getServer().getConsoleSender().sendMessage(message);
-        } else {
-            String message = languageManager.getString("system.hooks.disabled")
-                    .replace("{0}", "NeigeItems");
-            getServer().getConsoleSender().sendMessage(message);
-        }
-        
-        // Oraxen
-        OraxenHook.initialize();
-        if (OraxenHook.isEnabled()) {
-            String message = languageManager.getString("system.hooks.enabled")
-                    .replace("{prefix}", languageManager.getPrefix())
-                    .replace("{0}", "Oraxen");
-            getServer().getConsoleSender().sendMessage(message);
-        } else {
-            String message = languageManager.getString("system.hooks.disabled")
-                    .replace("{0}", "Oraxen");
             getServer().getConsoleSender().sendMessage(message);
         }
     }
@@ -167,16 +116,12 @@ public final class MonsterSpawner extends JavaPlugin {
         return actionManager;
     }
     
-    public boolean hasPlaceholderAPI() {
-        return PlaceholderAPIHook.isEnabled();
+    public HookManager getHookManager() {
+        return hookManager;
     }
     
-    /**
-     * 检查Oraxen是否启用
-     * @return Oraxen是否启用
-     */
-    public boolean hasOraxen() {
-        return OraxenHook.isEnabled();
+    public boolean hasPlaceholderAPI() {
+        return PlaceholderAPIHook.isEnabled();
     }
     
     /**
@@ -201,17 +146,27 @@ public final class MonsterSpawner extends JavaPlugin {
         return updateChecker;
     }
     
+    /**
+     * 获取破坏的刷怪笼数量
+     * @return 破坏的刷怪笼数量
+     */
+    public int getSpawnersBroken() {
+        return spawnersBroken.get();
+    }
+    
+    /**
+     * 获取放置的刷怪笼数量
+     * @return 放置的刷怪笼数量
+     */
+    public int getSpawnersPlaced() {
+        return spawnersPlaced.get();
+    }
+    
     @Override
     public void reloadConfig() {
         super.reloadConfig();
         if (languageManager != null) {
-            languageManager.loadLanguage();
-        }
-        
-        // 重新设置更新检查器
-        if (updateChecker != null) {
-            HandlerList.unregisterAll(updateChecker);
-            setupUpdateChecker();
+            languageManager.reload();
         }
     }
 }

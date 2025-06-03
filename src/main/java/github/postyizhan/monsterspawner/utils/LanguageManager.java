@@ -19,6 +19,10 @@ public class LanguageManager {
         loadLanguage();
     }
 
+    public void reload() {
+        loadLanguage();
+    }
+    
     public void loadLanguage() {
         language = plugin.getConfig().getString("language", "zh_CN");
         

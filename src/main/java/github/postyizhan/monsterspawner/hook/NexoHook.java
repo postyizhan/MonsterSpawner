@@ -1,19 +1,19 @@
 package github.postyizhan.monsterspawner.hook;
 
-import dev.lone.itemsadder.api.CustomStack;
+import com.nexomc.nexo.api.NexoItems;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class ItemsAdderHook implements ItemHook {
+public class NexoHook implements ItemHook {
     @Override
     public String getName() {
-        return "itemsadder";
+        return "nexo";
     }
 
     @Override
     public boolean isEnabled() {
         try {
-            Class.forName("dev.lone.itemsadder.api.CustomStack");
+            Class.forName("com.nexomc.nexo.api.NexoItems");
             return true;
         } catch (ClassNotFoundException e) {
             return false;
@@ -23,14 +23,12 @@ public class ItemsAdderHook implements ItemHook {
     @Override
     public ItemStack getItem(String id, Player player) {
         if (!isEnabled()) return null;
-        CustomStack customStack = CustomStack.getInstance(id);
-        return customStack != null ? customStack.getItemStack() : null;
+        return NexoItems.itemFromId(id) != null ? NexoItems.itemFromId(id).build() : null;
     }
 
     @Override
     public String getItemId(ItemStack item) {
         if (!isEnabled()) return null;
-        CustomStack customStack = CustomStack.byItemStack(item);
-        return customStack != null ? customStack.getId() : null;
+        return NexoItems.idFromItem(item);
     }
 } 

@@ -1,13 +1,9 @@
 package github.postyizhan.monsterspawner.utils;
 
 import github.postyizhan.monsterspawner.MonsterSpawner;
-import github.postyizhan.monsterspawner.hook.ItemsAdderHook;
-import github.postyizhan.monsterspawner.hook.MythicMobsHook;
-import github.postyizhan.monsterspawner.hook.NeigeItemsHook;
-import github.postyizhan.monsterspawner.hook.OraxenHook;
-import github.postyizhan.monsterspawner.hook.PlaceholderAPIHook;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -319,57 +315,7 @@ public class ActionManager {
      * @return 物品栈
      */
     private ItemStack parseItemStack(String content, int amount, Player player) {
-        // 尝试作为原版物品处理
-        try {
-            Material material = Material.valueOf(content.toUpperCase());
-            return new ItemStack(material, amount);
-        } catch (IllegalArgumentException ignored) {
-            // 不是原版物品，继续尝试其他插件物品
-        }
-        
-        // 尝试作为NeigeItems物品处理
-        if (content.toLowerCase().startsWith("neigeitems:")) {
-            String neigeItemId = content.substring("neigeitems:".length());
-            if (NeigeItemsHook.isEnabled()) {
-                return NeigeItemsHook.getItemStack(neigeItemId, amount);
-            }
-        }
-        
-        // 处理以"itemsadder:"开头的物品ID
-        if (content.toLowerCase().startsWith("itemsadder:")) {
-            String itemsAdderId = content.substring("itemsadder:".length());
-            if (ItemsAdderHook.isEnabled()) {
-                return ItemsAdderHook.getItemStack(itemsAdderId, amount);
-            }
-        }
-        // 原有的ItemsAdder处理逻辑
-        else if (content.contains(":") && ItemsAdderHook.isEnabled()) {
-            if (ItemsAdderHook.isItemsAdderItem(content)) {
-                return ItemsAdderHook.getItemStack(content, amount);
-            }
-        }
-        
-        // 处理以"oraxen:"开头的物品ID
-        if (content.toLowerCase().startsWith("oraxen:")) {
-            String oraxenItemId = content.substring("oraxen:".length());
-            if (plugin.hasOraxen()) {
-                return OraxenHook.getItemStack(oraxenItemId, amount);
-            }
-        }
-        // 原有的Oraxen处理逻辑
-        else if (plugin.hasOraxen() && OraxenHook.isOraxenItem(content)) {
-            return OraxenHook.getItemStack(content, amount);
-        }
-        
-        // 尝试作为MythicMobs物品处理
-        if (content.toLowerCase().startsWith("mythicmobs:")) {
-            String mythicItemId = content.substring("mythicmobs:".length());
-            if (MythicMobsHook.isEnabled()) {
-                return MythicMobsHook.getItemStack(mythicItemId, amount);
-            }
-        }
-        
-        // 如果所有尝试都失败，返回空
-        return null;
+        // 使用HookManager解析物品
+        return plugin.getHookManager().parseItemStack(content, amount, player);
     }
 }

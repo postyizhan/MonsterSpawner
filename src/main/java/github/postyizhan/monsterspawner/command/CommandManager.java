@@ -13,9 +13,11 @@ import java.util.stream.Collectors;
 public class CommandManager implements CommandExecutor, TabCompleter {
 
     private final MonsterSpawner plugin;
+    private final ItemCommand itemCommand;
 
     public CommandManager(MonsterSpawner plugin) {
         this.plugin = plugin;
+        this.itemCommand = new ItemCommand(plugin);
     }
 
     @Override
@@ -40,6 +42,22 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 showHelp(sender);
                 return true;
                 
+            case "item":
+                if (!sender.hasPermission("monsterspawner.admin")) {
+                    sender.sendMessage(plugin.getLanguageManager().getMessage("no-permission"));
+                    return true;
+                }
+                itemCommand.handleGetItem(sender, args);
+                return true;
+                
+            case "iteminfo":
+                if (!sender.hasPermission("monsterspawner.admin")) {
+                    sender.sendMessage(plugin.getLanguageManager().getMessage("no-permission"));
+                    return true;
+                }
+                itemCommand.handleItemInfo(sender);
+                return true;
+                
             default:
                 sender.sendMessage(plugin.getLanguageManager().getMessage("invalid-command"));
                 return true;
@@ -62,6 +80,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             
             if (sender.hasPermission("monsterspawner.admin")) {
                 commands.add("reload");
+                commands.add("item");
+                commands.add("iteminfo");
             }
             
             commands.add("help");
@@ -69,6 +89,27 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             return commands.stream()
                     .filter(s -> s.startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("item") && sender.hasPermission("monsterspawner.admin")) {
+            completions.add("minecraft:diamond");
+            completions.add("minecraft:emerald");
+            
+            // 添加常见命名空间提示
+            completions.add("oraxen:");
+            completions.add("itemsadder:");
+            completions.add("mythicmobs:");
+            completions.add("neigeitems:");
+            
+            return completions.stream()
+                    .filter(s -> s.startsWith(args[1].toLowerCase()))
+                    .collect(Collectors.toList());
+        } else if (args.length == 3 && args[0].equalsIgnoreCase("item") && sender.hasPermission("monsterspawner.admin")) {
+            completions.add("1");
+            completions.add("8");
+            completions.add("16");
+            completions.add("32");
+            completions.add("64");
+            
+            return completions;
         }
         
         return completions;

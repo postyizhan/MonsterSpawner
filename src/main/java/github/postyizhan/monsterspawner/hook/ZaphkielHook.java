@@ -1,19 +1,19 @@
 package github.postyizhan.monsterspawner.hook;
 
-import dev.lone.itemsadder.api.CustomStack;
+import ink.ptms.zaphkiel.ZaphkielAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class ItemsAdderHook implements ItemHook {
+public class ZaphkielHook implements ItemHook {
     @Override
     public String getName() {
-        return "itemsadder";
+        return "zaphkiel";
     }
 
     @Override
     public boolean isEnabled() {
         try {
-            Class.forName("dev.lone.itemsadder.api.CustomStack");
+            Class.forName("ink.ptms.zaphkiel.ZaphkielAPI");
             return true;
         } catch (ClassNotFoundException e) {
             return false;
@@ -23,14 +23,12 @@ public class ItemsAdderHook implements ItemHook {
     @Override
     public ItemStack getItem(String id, Player player) {
         if (!isEnabled()) return null;
-        CustomStack customStack = CustomStack.getInstance(id);
-        return customStack != null ? customStack.getItemStack() : null;
+        return ZaphkielAPI.getItemStack(id, player);
     }
 
     @Override
     public String getItemId(ItemStack item) {
         if (!isEnabled()) return null;
-        CustomStack customStack = CustomStack.byItemStack(item);
-        return customStack != null ? customStack.getId() : null;
+        return ZaphkielAPI.getItemId(item);
     }
 } 

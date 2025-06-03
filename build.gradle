@@ -24,6 +24,22 @@ repositories {
         name = "jitpack"
         url = "https://jitpack.io"
     }
+    maven {
+        name = "codemc"
+        url = "https://repo.codemc.org/repository/maven-public/"
+    }
+    maven {
+        name = "placeholderapi"
+        url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
+    }
+    maven {
+        name = "oraxen"
+        url = "https://repo.oraxen.com/releases"
+    }
+    maven {
+        name = "lumine"
+        url = "https://mvn.lumine.io/repository/maven-public/"
+    }
 }
 
 dependencies {
@@ -41,6 +57,31 @@ dependencies {
     
     // bStats
     implementation 'org.bstats:bstats-bukkit:3.0.2'
+
+    // PlaceholderAPI
+    compileOnly 'me.clip:placeholderapi:2.11.5'
+
+    // Oraxen
+    compileOnly 'io.th0rgal:oraxen:4.16.0'
+
+    // MythicMobs
+    compileOnly 'io.lumine:MythicLib:1.6.2'
+    compileOnly 'io.lumine:MythicBukkit:5.3.5'
+
+    // MMOItems
+    compileOnly 'net.Indyuce:MMOItems:6.9.4'
+
+    // Zaphkiel (暂时注释)
+    // compileOnly 'ink.ptms:zaphkiel:2.0.0'
+
+    // CraftEngine (暂时注释)
+    // compileOnly 'net.momirealms:craftengine:1.0.0'
+
+    // Nexo (本地jar)
+    compileOnly files('libs/nexo.jar')
+
+    // SXItem (本地jar)
+    compileOnly files('libs/sxitem.jar')
 }
 
 // 配置shadow插件，重定位bStats类
