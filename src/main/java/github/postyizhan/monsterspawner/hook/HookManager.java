@@ -1,10 +1,10 @@
 package github.postyizhan.monsterspawner.hook;
 
 import github.postyizhan.monsterspawner.MonsterSpawner;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,17 +29,17 @@ public class HookManager {
      * 注册所有钩子
      */
     private void registerHooks() {
-        // 注册Oraxen
-        registerHook(new OraxenHookImpl());
-        
-        // 注册ItemsAdder
-        registerHook(new ItemsAdderHookImpl());
-        
-        // 注册MythicMobs
-        registerHook(new MythicMobsHookImpl());
-        
-        // 注册NeigeItems
-        registerHook(new NeigeItemsHookImpl());
+        // 注册所有物品库钩子
+        registerHook(new OraxenHook(plugin));
+        registerHook(new ItemsAdderHook(plugin));
+        registerHook(new MythicMobsHook(plugin));
+        registerHook(new NeigeItemsHook(plugin));
+        registerHook(new MMOItemsHook(plugin));
+        registerHook(new ZaphkielHook(plugin));
+        registerHook(new CraftEngineHook(plugin));
+        registerHook(new NexoHook(plugin));
+        registerHook(new SXItemHook(plugin));
+        registerHook(new MagicGemHook(plugin));
         
         // 初始化所有钩子
         initializeHooks();
@@ -57,28 +57,69 @@ public class HookManager {
      * 初始化所有钩子
      */
     public void initializeHooks() {
-        for (HookAbstract hook : hookMap.values()) {
-            try {
-                hook.initialize();
-            } catch (Exception e) {
-                plugin.getLogger().warning("§c初始化" + hook.getName() + "钩子时出错: " + e.getMessage());
-                if (plugin.getConfig().getBoolean("debug")) {
-                    e.printStackTrace();
+        // 延迟加载钩子，确保所有依赖插件都已经完全加载
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                plugin.getLogger().info("§a[MonsterSpawner] 开始初始化物品库钩子...");
+                
+                for (HookAbstract hook : hookMap.values()) {
+                    try {
+                        plugin.getLogger().info("§a[MonsterSpawner] 正在初始化 " + hook.getName() + " 钩子...");
+                        boolean success = hook.initialize();
+                        plugin.getLogger().info("§a[MonsterSpawner] " + hook.getName() + " 钩子初始化" + 
+                                (success ? "§a成功" : "§c失败"));
+                    } catch (Exception e) {
+                        plugin.getLogger().warning("§c初始化" + hook.getName() + "钩子时出错: " + e.getMessage());
+                        if (plugin.getConfig().getBoolean("debug", false)) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
+                
+                // 打印钩子状态
+                printHookStatus();
+                
+                // 尝试重新初始化失败的钩子
+                plugin.getLogger().info("§a[MonsterSpawner] 尝试重新初始化失败的钩子...");
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        boolean anySuccess = false;
+                        for (HookAbstract hook : hookMap.values()) {
+                            if (!hook.isHooked()) {
+                                try {
+                                    plugin.getLogger().info("§a[MonsterSpawner] 重新尝试初始化 " + hook.getName() + " 钩子...");
+                                    boolean success = hook.initialize();
+                                    if (success) {
+                                        anySuccess = true;
+                                        plugin.getLogger().info("§a[MonsterSpawner] " + hook.getName() + " 钩子初始化§a成功");
+                                    }
+                                } catch (Exception e) {
+                                    if (plugin.getConfig().getBoolean("debug", false)) {
+                                        plugin.getLogger().warning("§c重新初始化" + hook.getName() + "钩子时出错: " + e.getMessage());
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (anySuccess) {
+                            // 如果有成功初始化的钩子，重新打印状态
+                            printHookStatus();
+                        }
+                    }
+                }.runTaskLater(plugin, 100L); // 再延迟5秒进行第二次尝试
             }
-        }
-        
-        // 打印钩子状态
-        printHookStatus();
+        }.runTaskLater(plugin, 60L); // 延迟3秒，等待所有插件加载完成
     }
     
     /**
      * 打印钩子状态
      */
     private void printHookStatus() {
-        Bukkit.getLogger().info("§a[MonsterSpawner] 物品库钩子状态:");
+        plugin.getLogger().info("§a[MonsterSpawner] 物品库钩子状态:");
         for (HookAbstract hook : hookMap.values()) {
-            Bukkit.getLogger().info("§a[MonsterSpawner] - " + hook.getName() + ": " + 
+            plugin.getLogger().info("§a[MonsterSpawner] - " + hook.getName() + ": " + 
                     (hook.isHooked() ? "§a已连接" : "§c未连接"));
         }
     }
@@ -90,6 +131,76 @@ public class HookManager {
      */
     public HookAbstract getHook(String namespace) {
         return hookMap.get(namespace.toLowerCase());
+    }
+    
+    /**
+     * 获取Oraxen钩子
+     */
+    public OraxenHook getOraxen() {
+        return (OraxenHook) getHook("oraxen");
+    }
+    
+    /**
+     * 获取ItemsAdder钩子
+     */
+    public ItemsAdderHook getItemsAdder() {
+        return (ItemsAdderHook) getHook("itemsadder");
+    }
+    
+    /**
+     * 获取MythicMobs钩子
+     */
+    public MythicMobsHook getMythicMobs() {
+        return (MythicMobsHook) getHook("mythicmobs");
+    }
+    
+    /**
+     * 获取NeigeItems钩子
+     */
+    public NeigeItemsHook getNeigeItems() {
+        return (NeigeItemsHook) getHook("neigeitems");
+    }
+    
+    /**
+     * 获取MMOItems钩子
+     */
+    public MMOItemsHook getMMOItems() {
+        return (MMOItemsHook) getHook("mmoitems");
+    }
+    
+    /**
+     * 获取Zaphkiel钩子
+     */
+    public ZaphkielHook getZaphkiel() {
+        return (ZaphkielHook) getHook("zaphkiel");
+    }
+    
+    /**
+     * 获取CraftEngine钩子
+     */
+    public CraftEngineHook getCraftEngine() {
+        return (CraftEngineHook) getHook("craftengine");
+    }
+    
+    /**
+     * 获取Nexo钩子
+     */
+    public NexoHook getNexo() {
+        return (NexoHook) getHook("nexo");
+    }
+    
+    /**
+     * 获取SXItem钩子
+     */
+    public SXItemHook getSXItem() {
+        return (SXItemHook) getHook("sxitem");
+    }
+    
+    /**
+     * 获取MagicGem钩子
+     */
+    public MagicGemHook getMagicGem() {
+        return (MagicGemHook) getHook("magicgem");
     }
     
     /**
@@ -128,11 +239,11 @@ public class HookManager {
             // 处理带命名空间的自定义物品
             HookAbstract hook = getHook(namespace);
             if (hook != null && hook.isHooked()) {
-                // 为NeigeItems提供特殊处理，支持玩家相关物品
-                if (hook instanceof NeigeItemsHookImpl && player != null) {
-                    return ((NeigeItemsHookImpl) hook).getItemForPlayer(id, player, amount);
+                if (player != null) {
+                    return hook.getItemForPlayer(id, player, amount);
+                } else {
+                    return hook.getItem(id, amount);
                 }
-                return hook.getItem(id, amount);
             }
         } else {
             // 无命名空间，尝试所有钩子
@@ -148,11 +259,11 @@ public class HookManager {
             // 尝试所有钩子
             for (HookAbstract hook : hookMap.values()) {
                 if (hook.isHooked() && hook.isCustomItem(itemString)) {
-                    // 为NeigeItems提供特殊处理，支持玩家相关物品
-                    if (hook instanceof NeigeItemsHookImpl && player != null) {
-                        return ((NeigeItemsHookImpl) hook).getItemForPlayer(itemString, player, amount);
+                    if (player != null) {
+                        return hook.getItemForPlayer(itemString, player, amount);
+                    } else {
+                        return hook.getItem(itemString, amount);
                     }
-                    return hook.getItem(itemString, amount);
                 }
             }
         }
@@ -184,4 +295,4 @@ public class HookManager {
         // 对于原版物品，返回minecraft命名空间
         return "minecraft:" + itemStack.getType().name().toLowerCase();
     }
-} 
+}

@@ -37,4 +37,4 @@ spawner:
     - "[buff] SPEED 10 1"
 
 # 调试模式
-debug: false
+debug: true

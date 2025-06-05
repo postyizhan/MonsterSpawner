@@ -1,6 +1,8 @@
 package github.postyizhan.monsterspawner.hook;
 
+import github.postyizhan.monsterspawner.MonsterSpawner;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -9,6 +11,13 @@ import org.bukkit.plugin.Plugin;
  * 提供基本的钩子功能和接口
  */
 public abstract class HookAbstract {
+    
+    private boolean hooked = false;
+    protected MonsterSpawner plugin;
+    
+    public HookAbstract(MonsterSpawner plugin) {
+        this.plugin = plugin;
+    }
 
     /**
      * 获取插件名称
@@ -37,9 +46,34 @@ public abstract class HookAbstract {
      * @return 是否成功连接
      */
     public boolean isHooked() {
-        Plugin plugin = getPlugin();
-        return plugin != null && plugin.isEnabled();
+        return hooked;
     }
+
+    /**
+     * 初始化钩子
+     * @return 是否初始化成功
+     */
+    public boolean initialize() {
+        Plugin hookPlugin = getPlugin();
+        if (hookPlugin != null && hookPlugin.isEnabled()) {
+            try {
+                hooked = initHook();
+                return hooked;
+            } catch (Exception e) {
+                plugin.getLogger().warning("§c初始化" + getName() + "钩子时出错: " + e.getMessage());
+                if (plugin.getConfig().getBoolean("debug", false)) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * 初始化钩子的具体实现
+     * @return 是否初始化成功
+     */
+    protected abstract boolean initHook();
 
     /**
      * 检查钩子是否已启用并可用
@@ -58,14 +92,8 @@ public abstract class HookAbstract {
      * 报告未启用钩子的滥用情况
      */
     public void reportAbuse() {
-        Bukkit.getLogger().warning("§c[MonsterSpawner] 尝试使用未启用的钩子: " + getName());
+        plugin.getLogger().warning("§c[MonsterSpawner] 尝试使用未启用的钩子: " + getName());
     }
-    
-    /**
-     * 初始化钩子
-     * @return 是否初始化成功
-     */
-    public abstract boolean initialize();
 
     /**
      * 根据ID获取物品
@@ -74,6 +102,17 @@ public abstract class HookAbstract {
      * @return 物品实例，如果获取失败则返回null
      */
     public abstract ItemStack getItem(String id, int amount);
+    
+    /**
+     * 根据ID和玩家获取物品（支持玩家相关的物品）
+     * @param id 物品ID
+     * @param player 玩家
+     * @param amount 数量
+     * @return 物品实例，如果获取失败则返回null
+     */
+    public ItemStack getItemForPlayer(String id, Player player, int amount) {
+        return getItem(id, amount); // 默认实现，子类可覆盖
+    }
 
     /**
      * 从物品实例获取物品ID
@@ -88,4 +127,4 @@ public abstract class HookAbstract {
      * @return 是否为该钩子管理的物品
      */
     public abstract boolean isCustomItem(String id);
-} 
+}

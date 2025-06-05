@@ -4,7 +4,7 @@ main: github.postyizhan.monsterspawner.MonsterSpawner
 api-version: '1.13'
 authors: [postyizhan]
 description: A lightweight Minecraft plugin for managing Monster Spawner
-softdepend: [PlaceholderAPI, ItemsAdder, MythicMobs, NeigeItems]
+softdepend: [PlaceholderAPI, ItemsAdder, MythicMobs, NeigeItems, MMOItems, Oraxen, Zaphkiel, CraftEngine, Nexo, SX-Item, MagicGem]
 
 commands:
   monsterspawner:

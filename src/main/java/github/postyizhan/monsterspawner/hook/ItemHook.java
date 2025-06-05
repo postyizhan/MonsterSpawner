@@ -30,4 +30,4 @@ public interface ItemHook {
      * @return The item ID, or null if not found
      */
     String getItemId(ItemStack item);
-} 
+}

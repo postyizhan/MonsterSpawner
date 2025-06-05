@@ -1,6 +1,7 @@
 package github.postyizhan.monsterspawner.utils;
 
 import github.postyizhan.monsterspawner.MonsterSpawner;
+import github.postyizhan.monsterspawner.hook.PlaceholderAPIHook;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
