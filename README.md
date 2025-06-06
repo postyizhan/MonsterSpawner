@@ -6,6 +6,10 @@
 
 一个轻量级的 Minecraft 刷怪笼管理插件，提供丰富的功能和灵活的配置。
 
+使用 Kotlin 重构，本项目不再维护
+
+新项目：github.com/postyizhan/PostSpawner
+
 ## 📚 功能特性
 
 - ✅ **刷怪笼管理**：支持精准采集和普通工具挖掘刷怪笼
